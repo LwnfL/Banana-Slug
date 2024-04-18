@@ -1,6 +1,10 @@
 import * as THREE from 'three'
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import GUI from 'lil-gui'
 
@@ -19,21 +23,52 @@ const scene = new THREE.Scene()
 /**
  * Models
  */
-const dracoLoader = new DRACOLoader()
-dracoLoader.setDecoderPath('/draco/')
 
-const gltfLoader = new GLTFLoader()
-gltfLoader.setDRACOLoader(dracoLoader)
+// const dracoLoader = new DRACOLoader()
+// dracoLoader.setDecoderPath('/draco/')
 
-let mixer = null
+// const gltfLoader = new GLTFLoader()
+// gltfLoader.setDRACOLoader(dracoLoader)
 
-gltfLoader.load(
-    '/models/hamburger.glb',
-    (gltf) =>
-    {
-        scene.add(gltf.scene)
-    }
-)
+// let mixer = null
+
+// gltfLoader.load(
+//     '/models/hamburger.glb',
+//     (gltf) =>
+//     {
+//         scene.add(gltf.scene)
+//     }
+// )
+// instantiate a loader
+
+const objLoader = new OBJLoader();
+
+// load a resource
+objLoader.load(
+	// resource URL
+	'models/dunce.obj',
+	// called when resource is loaded
+    
+    function (object) {
+        object.traverse(function (child) {
+            if (child instanceof THREE.Mesh) {
+                child.material = new THREE.MeshBasicMaterial({ color: 'yellow' }); // Change color here
+                child.castShadow = true
+                child.receiveShadow = true
+                child.name = 'BananaSlug'
+            }
+        });
+        scene.add(object);
+    },
+	// called when loading is in progresses
+	function ( xhr ) {
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+	},
+	// called when loading has errors
+	function ( error ) {
+		console.log( 'An error happened' );
+	}
+);
 
 /**
  * Floor
@@ -126,10 +161,10 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-    if(mixer)
-    {
-        mixer.update(deltaTime)
-    }
+    // if(object)
+    // {
+    //     object.update(deltaTime)
+    // }
 
     // Update controls
     controls.update()
