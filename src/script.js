@@ -148,6 +148,37 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.xr.enabled = true;
+document.body.appendChild(VRButton.createButton(renderer));
+// renderer.setAnimationLoop(animate);
+
+/**
+ * Controller/Raycasting
+ */
+
+const controller = renderer.xr.getController(0);
+scene.add(controller);
+
+const raycaster = new THREE.Raycaster();
+const tempMatrix = new THREE.Matrix4();
+
+controller.addEventListener('select', onSelect);
+
+function onSelect() {
+    tempMatrix.identity().extractRotation(controller.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+        if (intersects[0].object.name === 'BananSlug') {
+            window.location.href = 'https://www.ucsc.edu'; // Redirect URL
+        }
+    }
+}
+
 
 /**
  * Animate
